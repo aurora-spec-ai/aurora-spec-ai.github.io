@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Aurora: When RL Meets Adaptive Speculative Training - A Unified Training-Serving System">
+  <meta name="description" content="Aurora presents a unified training-serving system that closes the loop by continuously learning a speculator model directly from live inference traces, achieving 1.48× speedup and supporting day-0 deployment.">
+  <meta name="keywords" content="LLM inference, speculative decoding, reinforcement learning, online training, Aurora, machine learning systems">
+  <meta name="author" content="Fengxiang Bie, Junxiong Wang, Jisen Li, Zhongzhu Zhou, Chenfeng Xu, Zelei Shao, Yubo Wang, Yinghui Liu, Qingyang Wu, Avner May, Ben Athiwaratkun, Yineng Zhang, Shuaiwen Leon Song, Xiaoxia Wu">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aurora Project">
+  <meta property="og:title" content="Aurora: When RL Meets Adaptive Speculative Training">
+  <meta property="og:description" content="A unified training-serving system for speculative decoding with asynchronous RL-style updates">
+  <meta property="og:url" content="https://aurora-spec.github.io">
+  <meta property="og:image" content="https://aurora-spec.github.io/static/images/social_preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Aurora - Research Preview">
+  <meta property="article:published_time" content="2026-01-01T00:00:00.000Z">
+  <meta property="article:author" content="Xiaoxia Wu">
+  <meta property="article:section" content="Research">
+  <meta name="citation_corresponding_author" content="Xiaoxia Wu">
+  <meta name="citation_corresponding_author_email" content="shirley@together.ai">
+  <meta property="article:tag" content="LLM Inference">
+  <meta property="article:tag" content="Speculative Decoding">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@together_ai">
+  <meta name="twitter:creator" content="@together_ai">
+  <meta name="twitter:title" content="Aurora: When RL Meets Adaptive Speculative Training">
+  <meta name="twitter:description" content="A unified training-serving system for speculative decoding with asynchronous RL-style updates">
+  <meta name="twitter:image" content="https://aurora-spec.github.io/static/images/social_preview.png">
+  <meta name="twitter:image:alt" content="Aurora - Research Preview">
+
+  <!-- Academic/Research Specific -->
+  <meta name="citation_title" content="When RL Meets Adaptive Speculative Training: A Unified Training-Serving System">
+  <meta name="citation_author" content="Bie, Fengxiang">
+  <meta name="citation_author" content="Wang, Junxiong">
+  <meta name="citation_author" content="Li, Jisen">
+  <meta name="citation_author" content="Zhou, Zhongzhu">
+  <meta name="citation_author" content="Xu, Chenfeng">
+  <meta name="citation_author" content="Shao, Zelei">
+  <meta name="citation_author" content="Wang, Yubo">
+  <meta name="citation_author" content="Liu, Yinghui">
+  <meta name="citation_author" content="Wu, Qingyang">
+  <meta name="citation_author" content="May, Avner">
+  <meta name="citation_author" content="Athiwaratkun, Ben">
+  <meta name="citation_author" content="Zhang, Yineng">
+  <meta name="citation_author" content="Song, Shuaiwen Leon">
+  <meta name="citation_author" content="Wu, Xiaoxia">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="International Conference on Machine Learning (ICML)">
+  <meta name="citation_pdf_url" content="https://aurora-spec.github.io/static/pdfs/paper.pdf">
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#2563eb">
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://documentcloud.adobe.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>Aurora: When RL Meets Adaptive Speculative Training | ICML 2026 Submission</title>
+
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="static/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/images/favicon-16.png">
+  <link rel="apple-touch-icon" href="static/images/favicon-original.png">
+
+  <!-- Critical CSS - Load synchronously -->
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <!-- Non-critical CSS - Load asynchronously -->
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+  <!-- Fallback for browsers that don't support preload -->
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+
+  <!-- Fonts - Optimized loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Defer non-critical JavaScript -->
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <!-- Structured Data for Academic Papers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "When RL Meets Adaptive Speculative Training: A Unified Training-Serving System",
+    "description": "A unified training-serving system that closes the loop by continuously learning a speculator model directly from live inference traces",
+    "author": [
+      {"@type": "Person", "name": "Fengxiang Bie", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Junxiong Wang", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Jisen Li", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Zhongzhu Zhou", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Chenfeng Xu", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Zelei Shao", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Yubo Wang", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Yinghui Liu", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Qingyang Wu", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Avner May", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Ben Athiwaratkun", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Yineng Zhang", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Shuaiwen Leon Song", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Xiaoxia Wu", "affiliation": {"@type": "Organization", "name": "Together AI"}}
+    ],
+    "datePublished": "2026-01-01",
+    "publisher": {
+      "@type": "Organization",
+      "name": "International Conference on Machine Learning (ICML)"
+    },
+    "url": "https://aurora-spec.github.io",
+    "image": "https://aurora-spec.github.io/static/images/social_preview.png",
+    "keywords": ["LLM inference", "speculative decoding", "reinforcement learning", "online training", "machine learning systems"],
+    "abstract": "Speculative decoding can significantly accelerate LLM serving, but its real-world benefits often erode due to training-serving mismatch and non-stationary traffic. We present Aurora, a unified training-serving system that closes this loop by continuously learning a speculator model directly from live inference traces.",
+    "isAccessibleForFree": true,
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "mainEntity": {
+      "@type": "WebPage",
+      "@id": "https://aurora-spec.github.io"
+    },
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Machine Learning Systems"
+      },
+      {
+        "@type": "Thing",
+        "name": "LLM Inference"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Website/Organization Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Aurora Project",
+    "url": "https://aurora-spec.github.io",
+    "logo": "https://aurora-spec.github.io/static/images/favicon.ico"
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <!-- More Works Dropdown -->
+  <div class="more-works-container">
+    <button class="more-works-btn" onclick="toggleMoreWorks()" title="View Related Works">
+      <i class="fas fa-flask"></i>
+      Related Works
+      <i class="fas fa-chevron-down dropdown-arrow"></i>
+    </button>
+    <div class="more-works-dropdown" id="moreWorksDropdown">
+      <div class="dropdown-header">
+        <h4>Related Works</h4>
+        <button class="close-btn" onclick="toggleMoreWorks()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="works-list">
+        <a href="https://arxiv.org/abs/2310.07177" class="work-item" target="_blank">
+          <div class="work-info">
+            <h5>Online Speculative Decoding</h5>
+            <p>Introduces online training for speculative decoding using knowledge distilled from live traffic.</p>
+            <span class="work-venue">arXiv 2023</span>
+          </div>
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+        <a href="https://github.com/sgl-project/sglang" class="work-item" target="_blank">
+          <div class="work-info">
+            <h5>SGLang</h5>
+            <p>Efficient execution of structured language model programs with speculative decoding support.</p>
+            <span class="work-venue">NeurIPS 2024</span>
+          </div>
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+        <a href="https://arxiv.org/abs/2503.01840" class="work-item" target="_blank">
+          <div class="work-info">
+            <h5>EAGLE-3</h5>
+            <p>Scaling up inference acceleration of large language models via training-time test.</p>
+            <span class="work-venue">arXiv 2025</span>
+          </div>
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+        <a href="https://lmsys.org/blog/2025-07-25-spec-forge/" class="work-item" target="_blank">
+          <div class="work-info">
+            <h5>Specforge</h5>
+            <p>A framework for forging specialized speculative decoders through online learning.</p>
+            <span class="work-venue">LMSYS 2025</span>
+          </div>
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <main id="main-content">
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered" style="position: relative; z-index: 1;">
+            <h1 class="title is-1 aurora-gradient-text text-shimmer" style="margin-bottom: 0.5rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 1rem; font-size: 4.5rem;">
+              <img src="static/images/aurora-logo.png" alt="Aurora Logo" style="height: 110px; width: 110px; border-radius: 50%;" />
+              <span>Aurora</span>
+            </h1>
+            <h2 class="title is-2 publication-title" style="margin-top: 0; font-size: 2.8rem;">When RL Meets Adaptive Speculative Training: A Unified Training-Serving System</h2>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://jxiw.github.io/" target="_blank">Junxiong Wang</a><sup>*†</sup>,</span>
+              <span class="author-block">
+                <a href="#" target="_blank">Fengxiang Bie</a><sup>*†</sup>,</span>
+              <span class="author-block">
+                <a href="https://mtilyxuegao.github.io/" target="_blank">Jisen Li</a><sup>†</sup>,</span>
+              <span class="author-block">
+                <a href="https://zzz0906.github.io/" target="_blank">Zhongzhu Zhou</a><sup>†</sup>,</span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=at3N0m8AAAAJ&hl=en" target="_blank">Zelei Shao</a><sup>†</sup>,</span>
+              <span class="author-block">
+                <a href="https://www.linkedin.com/in/yubo-wang-057616117/" target="_blank">Yubo Wang</a><sup>†</sup>,</span>
+              <span class="author-block">
+                <a href="https://www.linkedin.com/in/yinghui-liu-737009119/" target="_blank">Yinghui Liu</a><sup>†</sup>,</span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=yDnbajoAAAAJ&hl=en" target="_blank">Qingyang Wu</a>,</span>
+              <span class="author-block">
+                <a href="https://avnermay.github.io/" target="_blank">Avner May</a>,</span>
+              <span class="author-block">
+                <a href="https://www.linkedin.com/in/srivy/" target="_blank">Sri Yanamandra</a>,</span>
+              <span class="author-block">
+                <a href="https://zhyncs.com/" target="_blank">Yineng Zhang</a>,</span>
+              <span class="author-block">
+                <a href="https://shuaiwen-leon-song.github.io/" target="_blank">Shuaiwen Song</a>,</span>
+              <span class="author-block">
+                <a href="https://zhangce.github.io/" target="_blank">Ce Zhang</a>,</span>
+              <span class="author-block">
+                <a href="https://tridao.me/" target="_blank">Tri Dao</a>,</span>
+              <span class="author-block">
+                <a href="https://cs.stanford.edu/~pliang/" target="_blank">Percy Liang</a>,</span>
+              <span class="author-block">
+                <a href="https://www.linkedin.com/in/benathi/" target="_blank">Ben Athiwaratkun</a>,</span>
+              <span class="author-block">
+                <a href="https://www.chenfengx.com/" target="_blank">Chenfeng Xu</a><sup>†</sup>,</span>
+              <span class="author-block">
+                <a href="https://xwushirley.github.io/" target="_blank">Xiaoxia Wu</a><sup>†</sup>
+              </span>
+            </div>
+
+            <div class="is-size-6 publication-authors" style="margin-top: 0.75rem; color: var(--text-secondary); font-style: italic;">
+              <span><sup>*</sup>Equal Contribution &nbsp;&nbsp; <sup>†</sup>Core Contributor</span>
+            </div>
+
+            <div class="is-size-6 publication-authors" style="margin-top: 0.25rem; color: var(--text-secondary);">
+              <span>The project leads are Xiaoxia Wu, Chenfeng Xu, and Junxiong Wang.</span>
+            </div>
+
+            <div class="publication-authors" style="margin-top: 0.75rem;">
+              <img src="static/images/together-ai-logo.png" alt="Together AI" style="height: 32px; display: inline-block;" />
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links" style="margin-top: -2rem;">
+                <span class="link-block">
+                  <a href="static/pdfs/paper.pdf" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a href="https://github.com/aurora-spec/aurora" target="_blank"
+                class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span>Code</span>
+              </a>
+            </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- Aurora Framework - Prominent Display -->
+<section class="section fade-in-up" style="padding: 1rem 1.5rem 3rem; margin-top: -4rem;">
+  <div class="container is-max-desktop">
+    <!-- Animated GIF Demo -->
+    <div style="position: relative; border-radius: var(--border-radius-lg); overflow: hidden; box-shadow: var(--shadow-xl); background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 2rem; margin-bottom: 2rem;">
+      <div style="position: absolute; top: -100px; left: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%); pointer-events: none; filter: blur(60px);"></div>
+      <div style="position: absolute; bottom: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%); pointer-events: none; filter: blur(60px);"></div>
+
+      <img src="static/images/aurora_ttt_animated.gif" alt="Aurora system in action" style="width: 100%; border-radius: var(--border-radius); position: relative; z-index: 1;" loading="eager"/>
+      <p class="has-text-centered" style="margin-top: 1.5rem; font-size: 1rem; line-height: 1.6; color: var(--text-secondary); position: relative; z-index: 1;">
+        <strong style="color: var(--text-primary);">Aurora in Action:</strong> Real-time demonstration of the unified training-serving system
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Why Aurora? -->
+<section class="section fade-in-up">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Why <span class="aurora-gradient-text">Aurora</span>?</h2>
+    <div class="content" style="margin-bottom: 2rem;">
+      <p class="has-text-centered" style="font-size: 1.1rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto 3rem;">
+        Traditional speculative decoding suffers from training-serving mismatch. Aurora solves this with a unified, continuously adaptive system.
+      </p>
+    </div>
+
+    <div class="feature-cards-grid stagger-container">
+      <div class="feature-card">
+        <div class="feature-icon float-icon">
+          <i class="fas fa-rocket"></i>
+        </div>
+        <div class="feature-title aurora-gradient-text" style="font-size: 2rem; font-weight: 800;">Day-0 Support</div>
+        <div class="feature-description">
+          Deploy and adapt from scratch without offline pretraining.
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon float-icon" style="animation-delay: 0.2s;">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <div class="feature-title aurora-gradient-text" style="font-size: 2rem; font-weight: 800;">1.57×</div>
+        <div class="feature-description">
+          Speedup on MiniMax M2.1 in mixed-data scenarios.
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon float-icon" style="animation-delay: 0.4s;">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="feature-title aurora-gradient-text" style="font-size: 2rem; font-weight: 800;">1.25×</div>
+        <div class="feature-description">
+          Speedup over static speculators on Qwen3/Llama3.
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon float-icon" style="animation-delay: 0.6s;">
+          <i class="fas fa-sync-alt"></i>
+        </div>
+        <div class="feature-title aurora-gradient-text" style="font-size: 2rem; font-weight: 800;">Unified Loop</div>
+        <div class="feature-description">
+          Online learning from live traffic reduces distribution shift.
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon float-icon" style="animation-delay: 0.8s;">
+          <i class="fas fa-memory"></i>
+        </div>
+        <div class="feature-title aurora-gradient-text" style="font-size: 2rem; font-weight: 800;">Cost Efficient</div>
+        <div class="feature-description">
+          Optimized serving footprint through continuous adaptation.
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon float-icon" style="animation-delay: 1s;">
+          <i class="fas fa-code-branch"></i>
+        </div>
+        <div class="feature-title aurora-gradient-text" style="font-size: 2rem; font-weight: 800;">Open Source</div>
+        <div class="feature-description">
+          Built on SGLang with full implementation available.
+        </div>
+      </div>
+    </div>
+
+    <div class="content" style="margin-top: 3rem;">
+      <div class="box aurora-accent" style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%); border-left: 4px solid transparent; border-image: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 50%, #ec4899 100%) 1;">
+        <p style="font-size: 1.1rem; line-height: 1.8; margin: 0;">
+          <strong style="color: var(--text-primary);">Key Finding:</strong>
+          <span style="color: var(--text-secondary);">
+            Online training from scratch can <em>exceed</em> the performance of a pretrained speculator,
+            challenging the conventional wisdom that speculative decoding requires offline pretraining.
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Speculative decoding can significantly accelerate LLM serving, yet most deployments today decouple speculator training from serving, treating it as a standalone offline modeling problem. This decoupled formulation introduces substantial challenges: high time-to-serve since speculators require extensive offline training before deployment, delayed utility feedback as true speedup is only known after deployment, and domain-drift degradation when target models adapt to new domains while speculators remain static.
+          </p>
+          <p>
+            We present <strong class="aurora-gradient-text" style="font-size: 1.15em;">Aurora</strong>, a unified training–serving system that closes this loop by continuously learning a speculator directly from live inference traces. Our design integrates an SGLang-based inference server with an asynchronous training server, enabling hot-swapped speculator updates without service interruption. Crucially, <strong class="aurora-gradient-text" style="font-size: 1.15em;">Aurora</strong> supports day-0 deployment—a speculator can be served immediately and rapidly adapted to live traffic. Across experiments, we achieve 1.45× speedup on recently released frontier models (MiniMax M2.1 229B and Qwen3-Coder-Next 80B) starting from scratch, and an additional 1.25× speedup over well-trained static speculators on widely used models (Qwen3 and Llama3), demonstrating effective adaptation to distribution shifts.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Motivation -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Motivation</h2>
+    <div class="content has-text-justified">
+      <p>
+        Most speculative decoding systems separate training from serving, introducing three key challenges:
+      </p>
+      <div style="margin-left: 2rem;">
+        <p style="margin-bottom: 0.3rem;"><strong>1. Training-Serving Mismatch</strong></p>
+        <p style="margin-left: 1rem; margin-top: 0.3rem;">
+          Offline training optimizes acceptance in controlled settings, but production speedups depend on deployment details like kernel implementations, precision (FP8/FP4), and batching. Strong offline performance may not translate to production, creating an optimization gap that undermines real-world efficiency gains.
+        </p>
+
+        <p style="margin-bottom: 0.3rem;"><strong>2. Verifier Drift</strong></p>
+        <p style="margin-left: 1rem; margin-top: 0.3rem;">
+          Target models update frequently, but drafters refresh slowly due to retraining costs. This creates staleness and degrades performance over time, as the drafter falls increasingly out of sync with evolving model outputs.
+        </p>
+
+        <p style="margin-bottom: 0.3rem;"><strong>3. Infrastructure Cost</strong></p>
+        <p style="margin-left: 1rem; margin-top: 0.3rem;">
+          Off-policy distillation requires collecting large volumes of model activations, leading to high storage and operational costs at scale. The infrastructure burden becomes prohibitive for continuous model updates.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- System Architecture -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">System Architecture</h2>
+    <div class="content has-text-justified">
+      <p>
+        Aurora features a decoupled architecture with two key components:
+      </p>
+
+      <p><strong>Inference Server:</strong> Runs an SGLang-based speculative decoding engine with a target model and draft model. For each request, both accepted and rejected tokens are streamed to a distributed data buffer for continuous training.</p>
+
+      <p><strong>Training Server:</strong> Asynchronously learns from live serving data in the buffer, performing gradient updates on a copy of the draft model and hot-swapping improved weights back to the inference server without service interruption.</p>
+
+      <!-- Aurora Framework Diagram -->
+      <div style="position: relative; border-radius: var(--border-radius-lg); overflow: hidden; box-shadow: var(--shadow-xl); background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 2rem; margin-top: 2rem;">
+        <!-- Decorative aurora glow -->
+        <div style="position: absolute; top: -100px; left: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%); pointer-events: none; filter: blur(60px);"></div>
+        <div style="position: absolute; bottom: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%); pointer-events: none; filter: blur(60px);"></div>
+
+        <img src="static/images/architecture/aurora_framework.png" alt="Aurora training-inference framework" style="width: 100%; border-radius: var(--border-radius); position: relative; z-index: 1;" loading="eager"/>
+        <p class="has-text-centered" style="margin-top: 1.5rem; font-size: 1rem; line-height: 1.6; color: var(--text-secondary); position: relative; z-index: 1;">
+          <strong style="color: var(--text-primary);">Aurora Training-Inference Framework:</strong> Online speculative training with asynchronous RL-style updates. A production inference server runs speculative decoding with a fixed target (verifier) and a lightweight draft (speculator), where proposed tokens are accepted or rejected during verification.
+        </p>
+      </div>
+
+      <!-- Placeholder for architecture diagram -->
+      <div style="text-align: center; margin-top: 2rem;">
+        <img src="static/images/architecture/system_design.png" alt="Aurora system architecture" style="max-width: 100%;" loading="lazy" onerror="this.style.display='none'"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Method -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Method</h2>
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Online Speculator Training as Asynchronous RL</h3>
+      <p>
+        We view online speculative decoding as an asynchronous reinforcement learning system. The draft model acts as the policy π, and the target model plus verifier implement the environment. Each speculative step forms a short episode: the policy proposes a tree of candidate continuations, the verifier accepts a prefix, and the outcome provides structured feedback. Accepted tokens correspond to positive reward, while rejected tokens provide zero/negative reward.
+      </p>
+
+      <h3 class="title is-4">Learning from Acceptance and Rejection</h3>
+      <p>
+        Verification yields richer supervision than acceptance-only imitation. We train the draft model with two complementary signals:
+      </p>
+      <ul>
+        <li><strong>Acceptance loss (imitation)</strong>: Cross-entropy on accepted tokens, encouraging the draft to reproduce verifier-approved continuations.</li>
+        <li><strong>Rejection loss (counterfactual feedback)</strong>: Rejected branches specify what the policy should not propose. With Discard Sampling, we apply a KL-based objective that pushes probability mass away from incorrect predictions.</li>
+      </ul>
+
+      <p>The total loss is a weighted combination:</p>
+      <div style="text-align: center; margin: 1.5rem 0;">
+        <em>L = E<sub>x~p<sub>accept</sub></sub>[KL(p<sub>target</sub> || p<sub>draft</sub>)] + λ<sub>discard</sub> E<sub>x~p<sub>discard</sub></sub>[KL(p<sub>target</sub> || p<sub>draft</sub>)]</em>
+      </div>
+
+      <h3 class="title is-4">Efficient Tree Attention</h3>
+      <p>
+        We employ a specialized Tree Attention mechanism to efficiently process the complex branching structure of speculative decoding results. By constructing a custom attention mask that respects the causal structure of the speculative tree, we can process all accepted and rejected branches in a single batched forward and backward pass.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Experiments -->
+<section class="section hero is-light fade-in-up">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Experimental <span class="aurora-gradient-text">Results</span></h2>
+    <div class="content has-text-justified">
+
+      <!-- Day-0 Training from Scratch -->
+      <h3 class="title is-4" style="margin-top: 2rem;">
+        <i class="fas fa-rocket" style="color: var(--aurora-cyan); margin-right: 0.5rem;"></i>
+        Day-0 Deployment: Training from Scratch
+      </h3>
+      <p>
+        Aurora enables <strong>day-0 serving</strong>: an untrained speculator can be deployed immediately and become production-ready through online adaptation. In mixed traffic scenarios, acceptance length reaches competitive levels.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin: 2rem 0;">
+        <!-- Qwen3-Coder-Next Column -->
+        <div>
+          <div class="feature-card aurora-glow-hover image-zoom-container" style="margin-bottom: 1.5rem;">
+            <img src="static/images/day_zero/qwen_coder_baseline_vs_aurora_scratch_accept_length_trend.png" alt="Qwen3-Coder-Next acceptance length" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          </div>
+          <div class="feature-card aurora-glow-hover image-zoom-container">
+            <img src="static/images/day_zero/qwen_coder_baseline_vs_aurora_scratch_per_request_throughput_trend.png" alt="Qwen3-Coder-Next throughput" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+            <strong>Qwen3-Coder-Next-FP8:</strong> Aurora (Scratch) raises acceptance length to 3, delivering 1.21× throughput improvement (batch size 8, averaged over final 10k steps after 1k warm-up).
+          </p>
+        </div>
+
+        <!-- MiniMax M2.1 Column -->
+        <div>
+          <div class="feature-card aurora-glow-hover image-zoom-container" style="margin-bottom: 1.5rem;">
+            <img src="static/images/day_zero/aurora_scratch_vs_no_speculator_bsz_4_8_comparison_accept_length_trend.png" alt="MiniMax M2.1 acceptance length" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          </div>
+          <div class="feature-card aurora-glow-hover image-zoom-container">
+            <img src="static/images/day_zero/aurora_scratch_vs_no_speculator_bsz_4_8_comparison_per_request_throughput_trend.png" alt="MiniMax M2.1 throughput" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+            <strong>MiniMax M2.1:</strong> Aurora (Scratch) increases acceptance length to 2.8, achieving 1.45× throughput gains over baseline.
+          </p>
+        </div>
+      </div>
+
+      <!-- Domain Shift Adaptation -->
+      <h3 class="title is-4" style="margin-top: 3rem;">
+        <i class="fas fa-sync-alt" style="color: var(--aurora-purple); margin-right: 0.5rem;"></i>
+        Adaptation to Distribution Shift
+      </h3>
+      <p>
+        When requests are grouped by domain to induce abrupt distribution changes, Aurora adapts continuously. The system recovers acceptance length within approximately 10,000 requests after each shift.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin: 2rem 0;">
+        <div class="feature-card aurora-glow-hover image-zoom-container">
+          <img src="static/images/results/group1_from_scratch_but_domain_shift_qwen3_8b_accept_length_trend1.png" alt="Domain shift acceptance" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+            Aurora adapts to domain shifts, recovering performance
+          </p>
+        </div>
+        <div class="feature-card aurora-glow-hover image-zoom-container">
+          <img src="static/images/results/group1_from_scratch_but_domain_shift_qwen3_8b_per_request_throughput_trend1.png" alt="Domain shift throughput" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+            Throughput maintains competitiveness despite domain shifts
+          </p>
+        </div>
+      </div>
+
+      <!-- Training with Existing Speculator -->
+      <h3 class="title is-4" style="margin-top: 3rem;">
+        <i class="fas fa-chart-line" style="color: var(--aurora-pink); margin-right: 0.5rem;"></i>
+        Training with Existing Speculator
+      </h3>
+      <p>
+        Starting from a trained speculator, Aurora achieves <strong>1.25× speedup</strong> over the static baseline through continuous adaptation.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin: 2rem 0;">
+        <!-- Training with Existing Speculator -->
+        <div>
+          <div class="feature-card aurora-glow-hover image-zoom-container" style="margin-bottom: 1.5rem;">
+            <img src="static/images/results/group3_trained_with_existed_spec_domain_shift_qwen3_8b_accept_length_trend.png" alt="Trained spec acceptance" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          </div>
+          <div class="feature-card aurora-glow-hover image-zoom-container">
+            <img src="static/images/results/group3_trained_with_existed_spec_domain_shift_qwen3_8b_per_request_throughput_trend.png" alt="Trained spec throughput" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+            Starting from a trained speculator, Aurora delivers 1.25× throughput improvement over static baseline under domain shifts.
+          </p>
+        </div>
+
+        <!-- Batch Size Ablation -->
+        <div>
+          <div class="feature-card aurora-glow-hover image-zoom-container" style="margin-bottom: 1.5rem;">
+            <img src="static/images/results/group7_batch_size_ablation__bs4_qwen3_8b_accept_length_trend.png" alt="Batch size ablation acceptance" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          </div>
+          <div class="feature-card aurora-glow-hover image-zoom-container">
+            <img src="static/images/results/group7_batch_size_ablation__bs4_qwen3_8b_per_request_throughput_trend.png" alt="Batch size ablation throughput" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          </div>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+            Batch size ablation study showing performance across different batch configurations.
+          </p>
+        </div>
+      </div>
+
+      <!-- Coding Domain Performance -->
+      <h3 class="title is-4" style="margin-top: 3rem;">
+        <i class="fas fa-code" style="color: var(--aurora-purple); margin-right: 0.5rem;"></i>
+        Coding Domain Performance
+      </h3>
+      <p>
+        Aurora also demonstrates strong performance on coding-specific workloads across different model families.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin: 2rem 0;">
+        <div class="feature-card aurora-glow-hover image-zoom-container">
+          <img src="static/images/results/figure7_qwen3_8b_coding_spec10_accept_length_trend.png" alt="Coding benchmark Qwen" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+            Coding benchmark results (Qwen3-8B)
+          </p>
+        </div>
+        <div class="feature-card aurora-glow-hover image-zoom-container">
+          <img src="static/images/results/figure7_llama_3.1_8b_coding_spec10_accept_length_trend.png" alt="Coding benchmark LLaMA" style="width: 100%; border-radius: var(--border-radius);" loading="lazy"/>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+            Coding benchmark results (LLaMA 3.1-8B)
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- Conclusion -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Conclusion</h2>
+    <div class="content has-text-justified">
+      <p>
+        We presented <strong class="aurora-gradient-text" style="font-size: 1.15em;">Aurora</strong>, a unified training-serving system that reframes speculative decoding as a joint learning-and-serving problem. By connecting an SGLang-based inference server with an asynchronous training server via GPU-aware RPC, <strong class="aurora-gradient-text" style="font-size: 1.15em;">Aurora</strong> enables continuous on-policy adaptation of the draft model under live traffic, closing the training-serving mismatch that limits conventional two-stage pipelines.
+      </p>
+      <p>
+        Our experiments show that simple online fine-tuning captures most attainable gains, that lazy synchronization best balances adaptation speed with serving stability, and that day-0 deployment from scratch is practical—an untrained speculator reaches competitive acceptance rates within thousands of requests, eliminating the offline pretraining bottleneck for onboarding new models.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- BibTeX citation -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <div class="bibtex-header">
+      <h2 class="title">BibTeX</h2>
+      <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+        <i class="fas fa-copy"></i>
+        <span class="copy-text">Copy</span>
+      </button>
+    </div>
+    <pre id="bibtex-code"><code>@article{aurora2026,
+  title={When RL Meets Adaptive Speculative Training: A Unified Training-Serving System},
+  author={Wang, Junxiong and Bie, Fengxiang and Li, Jisen and Zhou, Zhongzhu and Shao, Zelei and Wang, Yubo and Liu, Yinghui and Wu, Qingyang and May, Avner and Yanamandra, Sri and Zhang, Yineng and Song, Shuaiwen and Zhang, Ce and Dao, Tri and Liang, Percy and Athiwaratkun, Ben and Xu, Chenfeng and Wu, Xiaoxia},
+  journal={arXiv preprint arXiv:XXXX.XXXXX},
+  year={2026},
+  url={https://aurora-spec.github.io}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  </body>
+  </html>
