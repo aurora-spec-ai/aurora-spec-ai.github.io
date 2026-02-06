@@ -384,6 +384,16 @@ body {
   line-height: 1.7;
 }
 
+/* Make ClustrMaps ocean transparent */
+.visitor-map-container a,
+.visitor-map-container img {
+  mix-blend-mode: multiply;
+}
+
+.visitor-map-container {
+  background: transparent;
+}
+
 .footer a {
   color: var(--primary-color);
   text-decoration: none;
@@ -706,6 +716,23 @@ code {
   .content.has-text-justified {
     font-size: 1rem;
   }
+
+  /* Mobile optimization for visitor map */
+  .visitor-map-container {
+    overflow: hidden;
+  }
+
+  .visitor-map-container #clustrmaps,
+  .visitor-map-container a {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .visitor-map-container img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
 }
 
 @media screen and (max-width: 480px) {
@@ -732,6 +759,23 @@ code {
   .hero-body {
     padding: 1.5rem 0.75rem;
     overflow-x: hidden;
+  }
+
+  /* Mobile optimization for visitor map */
+  .visitor-map-container {
+    overflow: hidden;
+    padding: 0 0.5rem;
+  }
+
+  .visitor-map-container #clustrmaps,
+  .visitor-map-container a {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .visitor-map-container img {
+    max-width: 100% !important;
+    height: auto !important;
   }
 
   .more-works-container {
