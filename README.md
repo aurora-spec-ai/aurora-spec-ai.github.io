@@ -2,6 +2,7 @@
 
 > **A Unified Training-Serving System for LLM Inference Acceleration**
 
+[![ICML 2026](https://img.shields.io/badge/ICML-2026-purple)](https://icml.cc/)
 [![Website](https://img.shields.io/badge/Website-aurora--spec.github.io-blue)](https://aurora-spec.github.io)
 [![Paper](https://img.shields.io/badge/Paper-PDF-red)](https://aurora-spec.github.io/static/pdfs/paper.pdf)
 [![Code](https://img.shields.io/badge/Code-GitHub-green)](https://github.com/aurora-spec/aurora)
@@ -35,12 +36,12 @@ Aurora features a decoupled design with two components:
 ## Citation
 
 ```bibtex
-@article{aurora2026,
+@inproceedings{aurora2026,
   title={When RL Meets Adaptive Speculative Training: A Unified Training-Serving System},
-  author={Wang, Junxiong and Bie, Fengxiang and Li, Jisen and Zhou, Zhongzhu and Shao, Zelei and Wang, Yubo and Liu, Yinghui and Wu, Qingyang and May, Avner and Yanamandra, Sri and Zhang, Yineng and Song, Shuaiwen and Zhang, Ce and Dao, Tri and Liang, Percy and Athiwaratkun, Ben and Xu, Chenfeng and Wu, Xiaoxia},
-  journal={arXiv preprint arXiv:XXXX.XXXXX},
+  author={Wang, Junxiong and Bie, Fengxiang and Li, Jisen and Zhou, Zhongzhu and Shao, Zelei and Wang, Yubo and Liu, Yinghui and Wu, Qingyang and May, Avner and Yanamandra, Sri and Song, Shuaiwen and Zhang, Ce and Dao, Tri and Liang, Percy and Athiwaratkun, Ben and Xu, Chenfeng and Wu, Xiaoxia},
+  booktitle={International Conference on Machine Learning (ICML)},
   year={2026},
-  url={https://aurora-spec.github.io}
+  url={https://arxiv.org/abs/2602.06932}
 }
 ```
 
