@@ -3,9 +3,9 @@
 > **A Unified Training-Serving System for LLM Inference Acceleration**
 
 [![ICML 2026](https://img.shields.io/badge/ICML-2026-purple)](https://icml.cc/)
-[![Website](https://img.shields.io/badge/Website-aurora--spec.github.io-blue)](https://aurora-spec.github.io)
-[![Paper](https://img.shields.io/badge/Paper-PDF-red)](https://aurora-spec.github.io/static/pdfs/paper.pdf)
-[![Code](https://img.shields.io/badge/Code-GitHub-green)](https://github.com/aurora-spec/aurora)
+[![Website](https://img.shields.io/badge/Website-aurora--spec--ai.github.io-blue)](https://aurora-spec-ai.github.io/)
+[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/abs/2602.06932)
+[![Code](https://img.shields.io/badge/Code-GitHub-green)](https://github.com/togethercomputer/aurora)
 
 ## Overview
 
