@@ -11,7 +11,7 @@
   <meta name="title" content="Aurora: When RL Meets Adaptive Speculative Training - A Unified Training-Serving System">
   <meta name="description" content="Aurora presents a unified training-serving system that closes the loop by continuously learning a speculator model directly from live inference traces, achieving 1.48× speedup and supporting day-0 deployment.">
   <meta name="keywords" content="LLM inference, speculative decoding, reinforcement learning, online training, Aurora, machine learning systems">
-  <meta name="author" content="Junxiong Wang, Fengxiang Bie, Jisen Li, Zhongzhu Zhou, Zelei Shao, Yubo Wang, Yinghui Liu, Qingyang Wu, Avner May, Sri Yanamandra, Ce Zhang, Tri Dao, Percy Liang, Ben Athiwaratkun, Shuaiwen Leon Song, Chenfeng Xu, Xiaoxia Wu">
+  <meta name="author" content="Junxiong Wang, Fengxiang Bie, Jisen Li, Zelei Shao, Yubo Wang, Yinghui Liu, Qingyang Wu, Avner May, Sri Yanamandra, Ce Zhang, Tri Dao, Percy Liang, Ben Athiwaratkun, Shuaiwen Leon Song, Zhongzhu Zhou, Chenfeng Xu, Xiaoxia Wu">
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
 
@@ -47,7 +47,6 @@
   <meta name="citation_author" content="Wang, Junxiong">
   <meta name="citation_author" content="Bie, Fengxiang">
   <meta name="citation_author" content="Li, Jisen">
-  <meta name="citation_author" content="Zhou, Zhongzhu">
   <meta name="citation_author" content="Shao, Zelei">
   <meta name="citation_author" content="Wang, Yubo">
   <meta name="citation_author" content="Liu, Yinghui">
@@ -59,6 +58,7 @@
   <meta name="citation_author" content="Liang, Percy">
   <meta name="citation_author" content="Athiwaratkun, Ben">
   <meta name="citation_author" content="Song, Shuaiwen Leon">
+  <meta name="citation_author" content="Zhou, Zhongzhu">
   <meta name="citation_author" content="Xu, Chenfeng">
   <meta name="citation_author" content="Wu, Xiaoxia">
   <meta name="citation_publication_date" content="2026">
@@ -133,7 +133,6 @@
       {"@type": "Person", "name": "Junxiong Wang", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Fengxiang Bie", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Jisen Li", "affiliation": {"@type": "Organization", "name": "Together AI"}},
-      {"@type": "Person", "name": "Zhongzhu Zhou", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Zelei Shao", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Yubo Wang", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Yinghui Liu", "affiliation": {"@type": "Organization", "name": "Together AI"}},
@@ -145,6 +144,7 @@
       {"@type": "Person", "name": "Percy Liang", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Ben Athiwaratkun", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Shuaiwen Leon Song", "affiliation": {"@type": "Organization", "name": "Together AI"}},
+      {"@type": "Person", "name": "Zhongzhu Zhou", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Chenfeng Xu", "affiliation": {"@type": "Organization", "name": "Together AI"}},
       {"@type": "Person", "name": "Xiaoxia Wu", "affiliation": {"@type": "Organization", "name": "Together AI"}}
     ],
@@ -255,8 +255,6 @@
               <span class="author-block">
                 <a href="https://mtilyxuegao.github.io/" target="_blank">Jisen Li</a><sup>†</sup>,</span>
               <span class="author-block">
-                <a href="https://zzz0906.github.io/" target="_blank">Zhongzhu Zhou</a><sup>†</sup>,</span>
-              <span class="author-block">
                 <a href="https://scholar.google.com/citations?user=at3N0m8AAAAJ&hl=en" target="_blank">Zelei Shao</a><sup>†</sup>,</span>
               <span class="author-block">
                 <a href="https://www.linkedin.com/in/yubo-wang-057616117/" target="_blank">Yubo Wang</a><sup>†</sup>,</span>
@@ -278,6 +276,8 @@
                 <a href="https://www.linkedin.com/in/benathi/" target="_blank">Ben Athiwaratkun</a>,</span>
               <span class="author-block">
                 <a href="https://www.linkedin.com/in/leon-song-1a663019/" target="_blank">Shuaiwen Leon Song</a>,</span>
+              <span class="author-block">
+                <a href="https://zzz0906.github.io/" target="_blank">Zhongzhu Zhou</a><sup>†</sup>,</span>
               <span class="author-block">
                 <a href="https://www.chenfengx.com/" target="_blank">Chenfeng Xu</a><sup>†</sup>,</span>
               <span class="author-block">
@@ -747,7 +747,7 @@
     </div>
     <pre id="bibtex-code"><code>@inproceedings{aurora2026,
   title={When RL Meets Adaptive Speculative Training: A Unified Training-Serving System},
-  author={Wang, Junxiong and Bie, Fengxiang and Li, Jisen and Zhou, Zhongzhu and Shao, Zelei and Wang, Yubo and Liu, Yinghui and Wu, Qingyang and May, Avner and Yanamandra, Sri and Zhang, Ce and Dao, Tri and Liang, Percy and Athiwaratkun, Ben and Song, Shuaiwen Leon and Xu, Chenfeng and Wu, Xiaoxia},
+  author={Wang, Junxiong and Bie, Fengxiang and Li, Jisen and Shao, Zelei and Wang, Yubo and Liu, Yinghui and Wu, Qingyang and May, Avner and Yanamandra, Sri and Zhang, Ce and Dao, Tri and Liang, Percy and Athiwaratkun, Ben and Song, Shuaiwen Leon and Zhou, Zhongzhu and Xu, Chenfeng and Wu, Xiaoxia},
   booktitle={International Conference on Machine Learning (ICML)},
   year={2026},
   url={https://arxiv.org/abs/2602.06932}
